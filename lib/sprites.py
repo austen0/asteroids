@@ -6,14 +6,36 @@ import random
 class Asteroid(pygame.sprite.Sprite):
   def __init__(self, screen_size):
     pygame.sprite.Sprite.__init__(self)
+
     self.image = pygame.image.load('img/sprites/asteroid.png').convert_alpha()
-    self.image = pygame.transform.scale(self.image, (110, 110))
-    self.original = self.image
+    size = random.randint(55, 110)
+    self.image = pygame.transform.scale(self.image, (size, size))
     self.rect = self.image.get_rect()
 
-    width, height = screen_size
-    self.rect.center = (
-      random.randint(55, width - 55), random.randint(55, height - 55))
+    self.speed = random.randint(2, 8)
+    self.width, self.height = screen_size
+
+    x = random.choice([(-size / 2), (self.width + size / 2)])
+    y = random.choice([(-size / 2), (self.height + size / 2)])
+    self.rect.center = (x, y)
+
+    if x > 0 and y > 0:  # bottom right
+      self.angle = random.randint(181, 269)
+    if x > 0 and y < 0:  # top right
+      self.angle = random.randint(271, 359)
+    if x < 0 and y < 0:  # top left
+      self.angle = random.randint(1, 89)
+    if x < 0 and y > 0:  # bottom left
+      self.angle = random.randint(91, 179)
+
+  def update_location(self):
+    dy = self.speed * math.cos(math.radians(self.angle))
+    dx = self.speed * math.sin(math.radians(self.angle))
+    self.rect = self.rect.move(dx, dy)
+
+    if (self.rect.left < -100 or self.rect.right > self.width + 100 or
+      self.rect.top < -100 or self.rect.bottom > self.height + 100):
+      return True
 
 
 class Bullet(pygame.sprite.Sprite):
